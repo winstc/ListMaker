@@ -1,10 +1,12 @@
 #!/usr/bin/python3.5
 
 import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QTableWidget, QHBoxLayout
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, QTableWidgetItem
+from file_handler import CSVFile as cvs_f
 
-class mainWindow(QWidget):
+
+class MainWindow(QWidget):
     def __init__(self):
 
         super().__init__()
@@ -12,6 +14,8 @@ class mainWindow(QWidget):
         self.init_UI()
 
     def init_UI(self):
+
+        self.model = QStandardItemModel()
 
         self.resize(500, 500)
         self.move(300, 300)
@@ -23,32 +27,31 @@ class mainWindow(QWidget):
         saveBtn = QPushButton('Save', self)
         saveBtn.clicked.connect(self.save)
 
-        newItemBtn = QPushButton('New Item', self)
-        newItemBtn.clicked.connect(self.newitem)
+        newJobBtn = QPushButton('New Job', self)
+        newJobBtn.clicked.connect(self.newitem)
+
+        newPersonBtn = QPushButton('New Person', self)
+        newPersonBtn.clicked.connect(self.newitem)
 
         exportBtn = QPushButton('Export', self)
         exportBtn.clicked.connect(self.export_XLSX)
 
         closeBtn = QPushButton('Close', self)
-        closeBtn.clicked.connect(self.close)
+        closeBtn.clicked.connect(self.exit)
 
-
-
-        jobtable = QTableWidget()
-        jobtable.setRowCount(1)
-        jobtable.setColumnCount(5)
+        self.jobtable = QTableWidget()
 
         btnBox = QHBoxLayout()
         btnBox.addStretch(1)
         btnBox.addWidget(openBtn)
         btnBox.addWidget(saveBtn)
-        btnBox.addWidget(newItemBtn)
+        btnBox.addWidget(newJobBtn)
+        btnBox.addWidget(newPersonBtn)
         btnBox.addWidget(exportBtn)
         btnBox.addWidget(closeBtn)
 
-
         vertBox = QVBoxLayout()
-        vertBox.addWidget(jobtable)
+        vertBox.addWidget(self.jobtable)
         vertBox.addLayout(btnBox)
 
         self.setLayout(vertBox)
@@ -56,7 +59,18 @@ class mainWindow(QWidget):
         self.show()
 
     def open(self):
-        pass
+        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/winston/Desktop', "Comma Separated Value (*.csv)")
+        data = cvs_f.read(self, file_name[0])
+
+        self.jobtable.setRowCount(len(data))
+        self.jobtable.setColumnCount(len(data[0]))
+
+        for i, row in enumerate(data):
+            for j, col in enumerate(row):
+                item = QTableWidgetItem(col)
+                self.jobtable.setItem(i, j, item)
+
+
 
     def save(self):
         pass
@@ -67,12 +81,12 @@ class mainWindow(QWidget):
     def newitem(self):
         pass
 
-    def close(self):
+    def exit(self):
         sys.exit()
 
 
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    ex = mainWindow()
+    ex = MainWindow()
     sys.exit(app.exec_())
