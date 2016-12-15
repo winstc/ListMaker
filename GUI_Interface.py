@@ -70,10 +70,23 @@ class MainWindow(QWidget):
                 item = QTableWidgetItem(col)
                 self.jobtable.setItem(i, j, item)
 
-
-
     def save(self):
-        pass
+        data = []
+        file_name = QFileDialog.getSaveFileName(self, 'Save File', '/home/winston/Desktop',
+                                                "Comma Separated Value (*.csv)")
+        for row in range(self.jobtable.rowCount()):
+            print(row)
+            rowdata = []
+            for column in range(self.jobtable.columnCount()):
+                print(column ,":")
+                item = self.jobtable.item(row, column).data(0)
+                print(item)
+                rowdata.append(item)
+                print(rowdata)
+            data.append(rowdata)
+
+        cvs_f.write(self, file_name[0], data)
+
 
     def export_XLSX(self):
         pass

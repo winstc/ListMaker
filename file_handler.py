@@ -18,7 +18,7 @@ class CSVFile:
 
         return out
 
-    def wirte(self, file, data):
+    def write(self, file, data):
         with open(file, 'w') as csvFile:
             csv_write = csv.writer(csvFile)
             for row in data:
@@ -41,5 +41,5 @@ class XLSXFile:
 
 if __name__ == '__main__':
     c = CSVFile()
-    c.wirte('/home/winston/Desktop/test1.csv', c.read('/home/winston/Desktop/test.csv'))
+    c.write('/home/winston/Desktop/test1.csv', c.read('/home/winston/Desktop/test.csv'))
 
