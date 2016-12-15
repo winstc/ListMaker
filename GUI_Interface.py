@@ -28,7 +28,7 @@ class MainWindow(QWidget):
         saveBtn.clicked.connect(self.save)
 
         newJobBtn = QPushButton('New Job', self)
-        newJobBtn.clicked.connect(self.newitem)
+        newJobBtn.clicked.connect(self.newjob)
 
         newPersonBtn = QPushButton('New Person', self)
         newPersonBtn.clicked.connect(self.newitem)
@@ -40,6 +40,7 @@ class MainWindow(QWidget):
         closeBtn.clicked.connect(self.exit)
 
         self.jobtable = QTableWidget()
+        self.jobtable.itemChanged.connect(self.data_changed)
 
         btnBox = QHBoxLayout()
         btnBox.addStretch(1)
@@ -75,24 +76,30 @@ class MainWindow(QWidget):
         file_name = QFileDialog.getSaveFileName(self, 'Save File', '/home/winston/Desktop',
                                                 "Comma Separated Value (*.csv)")
         for row in range(self.jobtable.rowCount()):
-            print(row)
             rowdata = []
             for column in range(self.jobtable.columnCount()):
-                print(column ,":")
                 item = self.jobtable.item(row, column).data(0)
-                print(item)
                 rowdata.append(item)
-                print(rowdata)
             data.append(rowdata)
 
         cvs_f.write(self, file_name[0], data)
-
 
     def export_XLSX(self):
         pass
 
     def newitem(self):
         pass
+
+    def newjob(self):
+        if self.jobtable.columnCount() == 0:
+            self.jobtable.insertRow(0)
+            self.jobtable.insertColumn(0)
+
+    def data_changed(self):
+        if self.jobtable.item(self.jobtable.rowCount(), 0).data(0) != None:
+            self.jobtable.insertRow(self.jobtable.rowCount())
+        else:
+            self.jobtable.removeRow(self.jobtable.rowCount())
 
     def exit(self):
         sys.exit()
