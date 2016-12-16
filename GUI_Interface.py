@@ -2,7 +2,7 @@
 
 import sys
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, QTableWidgetItem, QInputDialog
 from file_handler import CSVFile as cvs_f
 
 
@@ -27,11 +27,13 @@ class MainWindow(QWidget):
         saveBtn = QPushButton('Save', self)
         saveBtn.clicked.connect(self.save)
 
-        newJobBtn = QPushButton('New Job', self)
+        newJobBtn = QPushButton('Add Jobs', self)
         newJobBtn.clicked.connect(self.newjob)
 
         newPersonBtn = QPushButton('New Person', self)
-        newPersonBtn.clicked.connect(self.newitem)
+        newPersonBtn.clicked.connect(self.newcolumn)
+
+        updateBtn = QPushButton("Update", self)
 
         exportBtn = QPushButton('Export', self)
         exportBtn.clicked.connect(self.export_XLSX)
@@ -48,6 +50,7 @@ class MainWindow(QWidget):
         btnBox.addWidget(saveBtn)
         btnBox.addWidget(newJobBtn)
         btnBox.addWidget(newPersonBtn)
+        btnBox.addWidget(updateBtn)
         btnBox.addWidget(exportBtn)
         btnBox.addWidget(closeBtn)
 
@@ -87,19 +90,23 @@ class MainWindow(QWidget):
     def export_XLSX(self):
         pass
 
-    def newitem(self):
-        pass
+    def newcolumn(self):
+        if self.jobtable.columnCount() >= 1:
+            self.jobtable.insertColumn(self.jobtable.columnCount())
+
 
     def newjob(self):
-        if self.jobtable.columnCount() == 0:
-            self.jobtable.insertRow(0)
-            self.jobtable.insertColumn(0)
+        num_of_rows = QInputDialog.getInt(self, 'Add Jobs', 'Number of Jobs', 1)
+
+        if num_of_rows[1]:
+            if self.jobtable.columnCount() == 0:
+                self.jobtable.insertColumn(0)
+
+            for i in range(num_of_rows[0]):
+                self.jobtable.insertRow(self.jobtable.rowCount())
 
     def data_changed(self):
-        if self.jobtable.item(self.jobtable.rowCount(), 0).data(0) != None:
-            self.jobtable.insertRow(self.jobtable.rowCount())
-        else:
-            self.jobtable.removeRow(self.jobtable.rowCount())
+        pass
 
     def exit(self):
         sys.exit()
