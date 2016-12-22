@@ -30,10 +30,11 @@ class MainWindow(QWidget):
         newJobBtn = QPushButton('Add Jobs', self)
         newJobBtn.clicked.connect(self.newjob)
 
-        newPersonBtn = QPushButton('New Person', self)
-        newPersonBtn.clicked.connect(self.newcolumn)
+        newColumnButton= QPushButton('New Column', self)
+        newColumnButton.clicked.connect(self.newcolumn)
 
         updateBtn = QPushButton("Update", self)
+        updateBtn.clicked.connect(self.update_list)
 
         exportBtn = QPushButton('Export', self)
         exportBtn.clicked.connect(self.export_XLSX)
@@ -49,7 +50,7 @@ class MainWindow(QWidget):
         btnBox.addWidget(openBtn)
         btnBox.addWidget(saveBtn)
         btnBox.addWidget(newJobBtn)
-        btnBox.addWidget(newPersonBtn)
+        btnBox.addWidget(newColumnButton)
         btnBox.addWidget(updateBtn)
         btnBox.addWidget(exportBtn)
         btnBox.addWidget(closeBtn)
@@ -94,7 +95,6 @@ class MainWindow(QWidget):
         if self.jobtable.columnCount() >= 1:
             self.jobtable.insertColumn(self.jobtable.columnCount())
 
-
     def newjob(self):
         num_of_rows = QInputDialog.getInt(self, 'Add Jobs', 'Number of Jobs', 1)
 
@@ -107,6 +107,28 @@ class MainWindow(QWidget):
 
     def data_changed(self):
         pass
+
+    def update_list(self):
+        if self.jobtable.columnCount() == 2:
+            num_rotations = QInputDialog.getInt(self, 'Update', 'Number of Rotations', self.jobtable.rowCount())
+            rotation = 1
+            if True:
+                for c in range(self.jobtable.columnCount(), num_rotations[0] + self.jobtable.columnCount()-1):
+                    self.jobtable.insertColumn(self.jobtable.columnCount())
+                    offset = 0
+                    for r in range(self.jobtable.rowCount()):
+                        try:
+                            item = QTableWidgetItem(self.jobtable.item(r, 1).data(0))
+                            print(item.text())
+                            if rotation + r < self.jobtable.rowCount():
+                                self.jobtable.setItem(rotation + r, c, item)
+                            else:
+                                self.jobtable.setItem(offset, c, item)
+                                offset += 1
+
+                        except TypeError:
+                            pass
+                    rotation += 1
 
     def exit(self):
         sys.exit()
