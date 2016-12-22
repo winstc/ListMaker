@@ -109,6 +109,10 @@ class MainWindow(QWidget):
         pass
 
     def update_list(self):
+        if self.jobtable.columnCount() > 2:
+            for x in range(self.jobtable.columnCount(), 1, -1):
+                print(x)
+                self.jobtable.removeColumn(x)
         if self.jobtable.columnCount() == 2:
             num_rotations = QInputDialog.getInt(self, 'Update', 'Number of Rotations', self.jobtable.rowCount())
             rotation = 1
