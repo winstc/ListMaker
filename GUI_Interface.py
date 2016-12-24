@@ -2,7 +2,7 @@
 
 import sys
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, QTableWidgetItem, QInputDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, QTableWidgetItem, QInputDialog, QMessageBox
 from file_handler import CSVFile as cvs_f
 
 
@@ -42,7 +42,7 @@ class MainWindow(QWidget):
         exportBtn.clicked.connect(self.export_XLSX)
 
         closeBtn = QPushButton('Close', self)
-        closeBtn.clicked.connect(self.exit)
+        closeBtn.clicked.connect(self._close)
 
         self.jobtable = QTableWidget()
         self.jobtable.itemChanged.connect(self.data_changed)
@@ -68,7 +68,6 @@ class MainWindow(QWidget):
     def open(self):
         file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "Comma Separated Value (*.csv)")
         if file_name[0] != '':
-            print("DEBUG")
             self.current_file = file_name[0]
             data = cvs_f.read(self, file_name[0])
 
@@ -93,6 +92,9 @@ class MainWindow(QWidget):
                 data.append(rowdata)
 
             cvs_f.write(self, file_name[0], data)
+            return 1
+        else:
+            return 0
 
     def export_XLSX(self):
         pass
@@ -140,8 +142,30 @@ class MainWindow(QWidget):
                             pass
                     rotation += 1
 
-    def exit(self):
-        sys.exit()
+    def _close(self):
+        if self.current_file:
+            self.save_on_exit()
+        else:
+            sys.exit()
+
+    def save_on_exit(self):
+        save = QMessageBox()
+        save.setText("You are about to exit.")
+        save.setInformativeText("Do you want to save your work?")
+        save.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel | QMessageBox.Discard)
+        save.setDefaultButton(QMessageBox.Save)
+
+        return_val = save.exec_()
+
+        if return_val == QMessageBox.Save:
+            if self.save():
+                sys.exit()
+        elif return_val == QMessageBox.Cancel:
+            pass
+        elif return_val == QMessageBox.Discard:
+            sys.exit()
+
+
 
 
 if __name__ == '__main__':
