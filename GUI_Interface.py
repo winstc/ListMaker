@@ -15,6 +15,8 @@ class MainWindow(QWidget):
 
     def init_UI(self):
 
+        self.current_file = None
+
         self.model = QStandardItemModel()
 
         self.resize(500, 500)
@@ -64,29 +66,33 @@ class MainWindow(QWidget):
         self.show()
 
     def open(self):
-        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/winston/Desktop', "Comma Separated Value (*.csv)")
-        data = cvs_f.read(self, file_name[0])
+        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "Comma Separated Value (*.csv)")
+        if file_name[0] != '':
+            print("DEBUG")
+            self.current_file = file_name[0]
+            data = cvs_f.read(self, file_name[0])
 
-        self.jobtable.setRowCount(len(data))
-        self.jobtable.setColumnCount(len(data[0]))
+            self.jobtable.setRowCount(len(data))
+            self.jobtable.setColumnCount(len(data[0]))
 
-        for i, row in enumerate(data):
-            for j, col in enumerate(row):
-                item = QTableWidgetItem(col)
-                self.jobtable.setItem(i, j, item)
+            for i, row in enumerate(data):
+                for j, col in enumerate(row):
+                    item = QTableWidgetItem(col)
+                    self.jobtable.setItem(i, j, item)
 
     def save(self):
         data = []
-        file_name = QFileDialog.getSaveFileName(self, 'Save File', '/home/winston/Desktop',
+        file_name = QFileDialog.getSaveFileName(self, 'Save File', self.current_file,
                                                 "Comma Separated Value (*.csv)")
-        for row in range(self.jobtable.rowCount()):
-            rowdata = []
-            for column in range(self.jobtable.columnCount()):
-                item = self.jobtable.item(row, column).data(0)
-                rowdata.append(item)
-            data.append(rowdata)
+        if file_name[0] != '':
+            for row in range(self.jobtable.rowCount()):
+                rowdata = []
+                for column in range(self.jobtable.columnCount()):
+                    item = self.jobtable.item(row, column).data(0)
+                    rowdata.append(item)
+                data.append(rowdata)
 
-        cvs_f.write(self, file_name[0], data)
+            cvs_f.write(self, file_name[0], data)
 
     def export_XLSX(self):
         pass
