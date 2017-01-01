@@ -166,8 +166,6 @@ class MainWindow(QWidget):
             sys.exit()
 
 
-
-
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)

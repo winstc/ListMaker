@@ -7,9 +7,6 @@ class CSVFile:
     def __init__(self):
         pass
 
-    def create(self):
-        pass
-
     def read(self, file):
         out = []
         with open(file) as csvFile:
@@ -27,9 +24,6 @@ class CSVFile:
 
 class XLSXFile:
     def __init__(self):
-        pass
-
-    def create(self):
         pass
 
     def read(self):
