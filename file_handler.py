@@ -28,9 +28,6 @@ class XLSXFile:
         self.workbook = xlsxwriter.Workbook(path)
         self.worksheet = self.workbook.add_worksheet(worksheet)
 
-    def read(self, file, data):
-        pass
-
     def write(self, data):
         for index, row in enumerate(data):
             self.worksheet.write_row('A' + str(index + 1), row)
