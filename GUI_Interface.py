@@ -3,7 +3,7 @@
 import sys
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, QTableWidgetItem, QInputDialog, QMessageBox
-from file_handler import CSVFile as cvs_f
+import file_handler as fh
 
 
 class MainWindow(QWidget):
@@ -69,7 +69,8 @@ class MainWindow(QWidget):
         file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "Comma Separated Value (*.csv)")
         if file_name[0] != '':
             self.current_file = file_name[0]
-            data = cvs_f.read(self, file_name[0])
+            csv_f = fh.CSVFile(file_name[0])
+            data = csv_f.read()
 
             self.jobtable.setRowCount(len(data))
             self.jobtable.setColumnCount(len(data[0]))
@@ -91,7 +92,8 @@ class MainWindow(QWidget):
                     rowdata.append(item)
                 data.append(rowdata)
 
-            cvs_f.write(self, file_name[0], data)
+            csv_f = fh.CSVFile(file_name[0])
+            csv_f.write(data)
             return 1
         else:
             return 0
