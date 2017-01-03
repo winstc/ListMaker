@@ -5,19 +5,19 @@ import xlsxwriter
 
 
 class CSVFile:
-    def __init__(self):
-        pass
+    def __init__(self, file):
+        self.file = file
 
-    def read(self, file):
+    def read(self):
         out = []
-        with open(file) as csvFile:
+        with open(self.file) as csvFile:
             for row in csv.reader(csvFile):
                 out += [row]
 
         return out
 
-    def write(self, file, data):
-        with open(file, 'w') as csvFile:
+    def write(self, data):
+        with open(self.file, 'w') as csvFile:
             csv_write = csv.writer(csvFile)
             for row in data:
                 csv_write.writerow(row)
