@@ -1,6 +1,7 @@
 #!/usr/bin/python3.5
 
 import csv
+import xlsxwriter
 
 
 class CSVFile:
@@ -23,17 +24,23 @@ class CSVFile:
 
 
 class XLSXFile:
-    def __init__(self):
+    def __init__(self, path, worksheet):
+        self.workbook = xlsxwriter.Workbook(path)
+        self.worksheet = self.workbook.add_worksheet(worksheet)
+
+    def read(self, file, data):
         pass
 
-    def read(self):
-        pass
+    def write(self, data):
+        for index, row in enumerate(data):
+            self.worksheet.write_row('A' + str(index + 1), row)
 
-    def write(self):
-        pass
+    def close(self):
+        self.workbook.close()
 
 
 if __name__ == '__main__':
     c = CSVFile()
-    c.write('/home/winston/Desktop/test1.csv', c.read('/home/winston/Desktop/test.csv'))
-
+    x = XLSXFile("/home/winston/Desktop/test.xlsx", "Sheet1")
+    x.write(c.read("/home/winston/Desktop/test.csv"))
+    x.close()
