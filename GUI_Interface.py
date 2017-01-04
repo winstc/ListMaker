@@ -82,20 +82,13 @@ class MainWindow(QWidget):  # class for the main window of the program
                     self.jobtable.setItem(i, j, item)  # add it to the table
 
     def save(self):  # saves the currently opened file
-        data = []  # used to store the data read from table
+
         # prompt user for location and name of file
         file_name = QFileDialog.getSaveFileName(self, 'Save File', self.current_file,
                                                 "Comma Separated Value (*.csv)")
         if file_name[0] != '':  # if the selected path is not blank
-            for row in range(self.jobtable.rowCount()):  # for each row in the table
-                rowdata = []  # temporarily stores row data
-                for column in range(self.jobtable.columnCount()):  # read each row column by column
-                    item = self.jobtable.item(row, column).data(0)  # read the data of cell at coordinate (row, column)
-                    rowdata.append(item)  # append the cell to row data
-                data.append(rowdata)  # append the completed row to full data list
-
             csv_f = fh.CSVFile(file_name[0])  # create new instance of CSVFile class using selected filename
-            csv_f.write(data)  # write complected data to the .csv file
+            csv_f.write(self.read_table_data())  # get data from table write it to .csv file
             return 1  # return if save was attempted
         else:  # if file name was blank
             return 0  # return 0
@@ -106,15 +99,8 @@ class MainWindow(QWidget):  # class for the main window of the program
         file_name = QFileDialog.getSaveFileName(self, 'Save File', self.current_file,
                                                 "XLSX File (*.xlsx)")
         if file_name[0] != '':  # if the file path is not blank
-            for row in range(self.jobtable.rowCount()):  # for each row in the table
-                rowdata = []  # temporarily stores row data
-                for column in range(self.jobtable.columnCount()):
-                    item = self.jobtable.item(row, column).data(0)
-                    rowdata.append(item)
-                data.append(rowdata)
-
             xlsx_f = fh.XLSXFile(file_name[0], "Sheet1")  # create new instance of XLSXFile class
-            xlsx_f.write(data)  # write the data to the .xlsx class
+            xlsx_f.write(self.read_table_data()) # get data from table write it to .xlsx file
             return 1  # return if save was attempted
         else:  # if file name was blank
             return 0  # return 0
@@ -175,6 +161,18 @@ class MainWindow(QWidget):  # class for the main window of the program
             pass
         elif return_val == QMessageBox.Discard:
             sys.exit()
+
+    def read_table_data(self):  # read data from the table returns it as a list
+        data = []  # used to store the data read from table
+
+        for row in range(self.jobtable.rowCount()):  # for each row in the table
+            rowdata = []  # temporarily stores row data
+            for column in range(self.jobtable.columnCount()):  # read each row column by column
+                item = self.jobtable.item(row, column).data(0)  # read the data of cell at coordinate (row, column)
+                rowdata.append(item)  # append the cell to row data
+            data.append(rowdata)  # append the completed row to full data list
+
+        return data  # return the table data
 
 
 if __name__ == '__main__':  # if file is launched by itself
