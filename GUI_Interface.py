@@ -1,9 +1,10 @@
 #!/usr/bin/python3.5
 
-import sys
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, QTableWidgetItem, QInputDialog, QMessageBox
-import file_handler as fh
+import sys  # import system library
+from PyQt5.QtGui import QStandardItemModel  # import the QStandardItemModel object
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, \
+    QTableWidgetItem, QInputDialog, QMessageBox  # import the needed Qt widgets
+import file_handler as fh  # import file_handler.py
 
 
 class MainWindow(QWidget):

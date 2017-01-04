@@ -34,10 +34,3 @@ class XLSXFile:
 
     def close(self):
         self.workbook.close()
-
-
-if __name__ == '__main__':
-    c = CSVFile()
-    x = XLSXFile("/home/winston/Desktop/test.xlsx", "Sheet1")
-    x.write(c.read("/home/winston/Desktop/test.csv"))
-    x.close()
