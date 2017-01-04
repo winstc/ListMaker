@@ -29,8 +29,8 @@ class MainWindow(QWidget):
         saveBtn = QPushButton('Save', self)
         saveBtn.clicked.connect(self.save)
 
-        newJobBtn = QPushButton('Add Jobs', self)
-        newJobBtn.clicked.connect(self.newjob)
+        addRowBtn = QPushButton('Add Row', self)
+        addRowBtn.clicked.connect(self.newjob)
 
         newColumnButton= QPushButton('New Column', self)
         newColumnButton.clicked.connect(self.newcolumn)
@@ -51,7 +51,7 @@ class MainWindow(QWidget):
         btnBox.addStretch(1)
         btnBox.addWidget(openBtn)
         btnBox.addWidget(saveBtn)
-        btnBox.addWidget(newJobBtn)
+        btnBox.addWidget(addRowBtn)
         btnBox.addWidget(newColumnButton)
         btnBox.addWidget(updateBtn)
         btnBox.addWidget(exportBtn)
@@ -99,7 +99,22 @@ class MainWindow(QWidget):
             return 0
 
     def export_XLSX(self):
-        pass
+        data = []
+        file_name = QFileDialog.getSaveFileName(self, 'Save File', self.current_file,
+                                                "XLSX File (*.xlsx)")
+        if file_name[0] != '':
+            for row in range(self.jobtable.rowCount()):
+                rowdata = []
+                for column in range(self.jobtable.columnCount()):
+                    item = self.jobtable.item(row, column).data(0)
+                    rowdata.append(item)
+                data.append(rowdata)
+
+            xlsx_f = fh.XLSXFile(file_name[0], "Sheet1")
+            xlsx_f.write(data)
+            return 1
+        else:
+            return 0
 
     def newcolumn(self):
         if self.jobtable.columnCount() >= 1:
