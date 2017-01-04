@@ -29,11 +29,8 @@ class MainWindow(QWidget):
         saveBtn = QPushButton('Save', self)
         saveBtn.clicked.connect(self.save)
 
-        addRowBtn = QPushButton('Add Row', self)
-        addRowBtn.clicked.connect(self.newjob)
-
-        newColumnButton= QPushButton('New Column', self)
-        newColumnButton.clicked.connect(self.newcolumn)
+        addRowBtn = QPushButton('Add Rows', self)
+        addRowBtn.clicked.connect(self.addrow)
 
         updateBtn = QPushButton("Update", self)
         updateBtn.clicked.connect(self.update_list)
@@ -46,13 +43,15 @@ class MainWindow(QWidget):
 
         self.jobtable = QTableWidget()
         self.jobtable.itemChanged.connect(self.data_changed)
+        self.jobtable.insertColumn(0)
+        self.jobtable.insertColumn(0)
+        self.jobtable.insertRow(0)
 
         btnBox = QHBoxLayout()
         btnBox.addStretch(1)
         btnBox.addWidget(openBtn)
         btnBox.addWidget(saveBtn)
         btnBox.addWidget(addRowBtn)
-        btnBox.addWidget(newColumnButton)
         btnBox.addWidget(updateBtn)
         btnBox.addWidget(exportBtn)
         btnBox.addWidget(closeBtn)
@@ -116,17 +115,10 @@ class MainWindow(QWidget):
         else:
             return 0
 
-    def newcolumn(self):
-        if self.jobtable.columnCount() >= 1:
-            self.jobtable.insertColumn(self.jobtable.columnCount())
-
-    def newjob(self):
-        num_of_rows = QInputDialog.getInt(self, 'Add Jobs', 'Number of Jobs', 1)
+    def addrow(self):
+        num_of_rows = QInputDialog.getInt(self, 'Add Rows', 'Number of Rows to Insert', 1)
 
         if num_of_rows[1]:
-            if self.jobtable.columnCount() == 0:
-                self.jobtable.insertColumn(0)
-
             for i in range(num_of_rows[0]):
                 self.jobtable.insertRow(self.jobtable.rowCount())
 
