@@ -43,7 +43,6 @@ class MainWindow(QWidget):  # class for the main window of the program
 
         # create and configure the main table
         self.jobtable = QTableWidget()  # create a new table widget
-        self.jobtable.itemChanged.connect(self.data_changed)  # call data_changed method when user changes selection
         self.jobtable.insertColumn(0)  # add a new column at index 0
         self.jobtable.insertColumn(0)  # add a new column at index 0
         self.jobtable.insertRow(0)  # add a new row at index 0
@@ -127,9 +126,6 @@ class MainWindow(QWidget):  # class for the main window of the program
         if num_of_rows[1]:  # if the dialog exits with a yes
             for i in range(num_of_rows[0]):  # for number of requested rows
                 self.jobtable.insertRow(self.jobtable.rowCount())  # add row at the end of the table
-
-    def data_changed(self):
-        pass
 
     def update_list(self):
         if self.jobtable.columnCount() > 2:
