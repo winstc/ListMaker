@@ -7,49 +7,50 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHB
 import file_handler as fh  # import file_handler.py
 
 
-class MainWindow(QWidget):
-    def __init__(self):
+class MainWindow(QWidget):  # class for the main window of the program
+
+    def __init__(self):  #
 
         super().__init__()
 
-        self.init_UI()
+        self.init_UI()  # call init_UI method
 
-    def init_UI(self):
+    def init_UI(self):  # handles the setup of the MainWindow
 
-        self.current_file = None
+        self.current_file = None  # create a variable that will be used to store the currently opened file name
 
-        self.model = QStandardItemModel()
+        self.resize(500, 500)  # resize the window
+        self.move(300, 300)  # move the window away from the screen edge
+        self.setWindowTitle('List Maker')  # set the window title
 
-        self.resize(500, 500)
-        self.move(300, 300)
-        self.setWindowTitle('List Maker')
+        openBtn = QPushButton('Open', self)  # create the open button
+        openBtn.clicked.connect(self.open)  # link it to its method
 
-        openBtn = QPushButton('Open', self)
-        openBtn.clicked.connect(self.open)
+        saveBtn = QPushButton('Save', self)  # create the save button
+        saveBtn.clicked.connect(self.save)  # link it the its method
 
-        saveBtn = QPushButton('Save', self)
-        saveBtn.clicked.connect(self.save)
+        addRowBtn = QPushButton('Add Rows', self)  # create the Add Rows button
+        addRowBtn.clicked.connect(self.addrow)  # link it the its method
 
-        addRowBtn = QPushButton('Add Rows', self)
-        addRowBtn.clicked.connect(self.addrow)
+        updateBtn = QPushButton("Update", self)  # create the update button
+        updateBtn.clicked.connect(self.update_list)  # link it the its method
 
-        updateBtn = QPushButton("Update", self)
-        updateBtn.clicked.connect(self.update_list)
+        exportBtn = QPushButton('Export', self)  # create the export button
+        exportBtn.clicked.connect(self.export_XLSX)  # link it the its method
 
-        exportBtn = QPushButton('Export', self)
-        exportBtn.clicked.connect(self.export_XLSX)
+        closeBtn = QPushButton('Close', self)  # create the close button
+        closeBtn.clicked.connect(self._close)  # link it the its method
 
-        closeBtn = QPushButton('Close', self)
-        closeBtn.clicked.connect(self._close)
+        # create and configure the main table
+        self.jobtable = QTableWidget()  # create a new table widget
+        self.jobtable.itemChanged.connect(self.data_changed)  # call data_changed method when user changes selection
+        self.jobtable.insertColumn(0)  # add a new column at index 0
+        self.jobtable.insertColumn(0)  # add a new column at index 0
+        self.jobtable.insertRow(0)  # add a new row at index 0
 
-        self.jobtable = QTableWidget()
-        self.jobtable.itemChanged.connect(self.data_changed)
-        self.jobtable.insertColumn(0)
-        self.jobtable.insertColumn(0)
-        self.jobtable.insertRow(0)
-
-        btnBox = QHBoxLayout()
-        btnBox.addStretch(1)
+        btnBox = QHBoxLayout()  # create a layout box for program buttons
+        btnBox.addStretch(1)  # set the box to fill the window horizontally
+        # add program buttons to the layout box
         btnBox.addWidget(openBtn)
         btnBox.addWidget(saveBtn)
         btnBox.addWidget(addRowBtn)
@@ -57,30 +58,31 @@ class MainWindow(QWidget):
         btnBox.addWidget(exportBtn)
         btnBox.addWidget(closeBtn)
 
-        vertBox = QVBoxLayout()
-        vertBox.addWidget(self.jobtable)
-        vertBox.addLayout(btnBox)
+        vertBox = QVBoxLayout()  # create another layout box to hold the rest of the UI
+        vertBox.addWidget(self.jobtable)  # add the table to the layout box
+        vertBox.addLayout(btnBox)  # add the button layout box to vertBox
 
-        self.setLayout(vertBox)
+        self.setLayout(vertBox)  # set the window layout to use veryBox for the layout
 
-        self.show()
+        self.show()  # show the main window
 
-    def open(self):
-        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "Comma Separated Value (*.csv)")
-        if file_name[0] != '':
-            self.current_file = file_name[0]
-            csv_f = fh.CSVFile(file_name[0])
-            data = csv_f.read()
+    def open(self):  # called when user clicks the open button
+        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "Comma Separated Value (*.csv)")  # create a new 'open file' dialog
+        if file_name[0] != '':  # if the file name isn't blank
+            self.current_file = file_name[0]  # set current_file name to the file the user picked
+            csv_f = fh.CSVFile(file_name[0])  # create a new 'CSVFile' instance from file_handler.py
+            data = csv_f.read()  # read the .csv file
 
+            # set columns and rows to match those of the file
             self.jobtable.setRowCount(len(data))
             self.jobtable.setColumnCount(len(data[0]))
 
-            for i, row in enumerate(data):
-                for j, col in enumerate(row):
-                    item = QTableWidgetItem(col)
-                    self.jobtable.setItem(i, j, item)
+            for i, row in enumerate(data):  # for each row in csv data
+                for j, col in enumerate(row): # and each column in each row
+                    item = QTableWidgetItem(col)  # create a new item with the data for current cell
+                    self.jobtable.setItem(i, j, item)  # add it to the table
 
-    def save(self):
+    def save(self):  # saves the currently opened file
         data = []
         file_name = QFileDialog.getSaveFileName(self, 'Save File', self.current_file,
                                                 "Comma Separated Value (*.csv)")
@@ -176,8 +178,7 @@ class MainWindow(QWidget):
             sys.exit()
 
 
-if __name__ == '__main__':
-
-    app = QApplication(sys.argv)
-    ex = MainWindow()
-    sys.exit(app.exec_())
+if __name__ == '__main__':  # if file is launched by itself
+        app = QApplication(sys.argv)  # create a new QApplication
+        ex = MainWindow()  # create the main window
+        sys.exit(app.exec_())  # exit when the app closes
