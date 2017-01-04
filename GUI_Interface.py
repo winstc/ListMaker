@@ -1,9 +1,10 @@
 #!/usr/bin/python3.5
 
 import sys  # import system library
+from PyQt5 import QtCore
 from PyQt5.QtGui import QStandardItemModel  # import the QStandardItemModel object
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, \
-    QTableWidgetItem, QInputDialog, QMessageBox  # import the needed Qt widgets
+    QTableWidgetItem, QInputDialog, QMessageBox, QProgressDialog  # import the needed Qt widgets
 import file_handler as fh  # import file_handler.py
 
 
@@ -113,31 +114,39 @@ class MainWindow(QWidget):  # class for the main window of the program
             for i in range(num_of_rows[0]):  # for number of requested rows
                 self.jobtable.insertRow(self.jobtable.rowCount())  # add row at the end of the table
 
-    def update_list(self):
-        if self.jobtable.columnCount() > 2:
-            for x in range(self.jobtable.columnCount(), 1, -1):
-                print(x)
-                self.jobtable.removeColumn(x)
-        if self.jobtable.columnCount() == 2:
+    def update_list(self):  # add rotations to the list
+        if self.jobtable.columnCount() > 2:  # if there are at least two columns in the table
+            for x in range(self.jobtable.columnCount(), 1, -1):  # for every column but the first two
+                self.jobtable.removeColumn(x)  # delete the column
+        if self.jobtable.columnCount() == 2:  # if there are only two columns
+            # prompt user for number of rotations - default is the number of rows it the table
             num_rotations = QInputDialog.getInt(self, 'Update', 'Number of Rotations', self.jobtable.rowCount())
-            rotation = 1
-            if True:
-                for c in range(self.jobtable.columnCount(), num_rotations[0] + self.jobtable.columnCount()-1):
-                    self.jobtable.insertColumn(self.jobtable.columnCount())
-                    offset = 0
-                    for r in range(self.jobtable.rowCount()):
-                        try:
-                            item = QTableWidgetItem(self.jobtable.item(r, 1).data(0))
-                            print(item.text())
-                            if rotation + r < self.jobtable.rowCount():
-                                self.jobtable.setItem(rotation + r, c, item)
-                            else:
-                                self.jobtable.setItem(offset, c, item)
-                                offset += 1
+            rotation = 1  # stores the current rotation
 
-                        except TypeError:
-                            pass
-                    rotation += 1
+            # create a progress bar dialog - without this the UI would appear unresponsive
+            progress = QProgressDialog("Generating List...", "Cancel", 0, num_rotations[0])
+            progress.setWindowModality(QtCore.Qt.ApplicationModal)
+
+            for c in range(self.jobtable.columnCount(), num_rotations[0] + self.jobtable.columnCount() - 1):
+
+                if (progress.wasCanceled()):
+                    break
+
+                self.jobtable.insertColumn(self.jobtable.columnCount())
+                offset = 0
+                progress.setValue(rotation)
+                for r in range(self.jobtable.rowCount()):
+                    try:
+                        item = QTableWidgetItem(self.jobtable.item(r, 1).data(0))
+                        if rotation + r < self.jobtable.rowCount():
+                            self.jobtable.setItem(rotation + r, c, item)
+                        else:
+                            self.jobtable.setItem(offset, c, item)
+                            offset += 1
+
+                    except TypeError:
+                        pass
+                rotation += 1
 
     def _close(self):
         if self.current_file:
