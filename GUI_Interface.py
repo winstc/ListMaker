@@ -115,44 +115,48 @@ class MainWindow(QWidget):  # class for the main window of the program
                 self.jobtable.insertRow(self.jobtable.rowCount())  # add row at the end of the table
 
     def update_list(self):  # add rotations to the list
-        if self.jobtable.columnCount() > 2:  # if there are at least two columns in the table
-            for x in range(self.jobtable.columnCount(), 1, -1):  # for every column but the first two
-                self.jobtable.removeColumn(x)  # delete the column
-        if self.jobtable.columnCount() == 2:  # if there are only two columns
-            # prompt user for number of rotations - default is the number of rows it the table
-            num_rotations = QInputDialog.getInt(self, 'Update', 'Number of Rotations', self.jobtable.rowCount())
-            rotation = 1  # stores the current rotation
+        # prompt user for number of rotations - default is the number of rows it the table
+        num_rotations = QInputDialog.getInt(self, 'Update', 'Number of Rotations', self.jobtable.rowCount())
 
-            # create a progress bar dialog - without this the UI would appear unresponsive
-            progress = QProgressDialog("Generating List...", "Cancel", 0, num_rotations[0])
-            progress.setWindowModality(QtCore.Qt.ApplicationModal)
+        if num_rotations[1]:  # if user confirms dialog
+            if self.jobtable.columnCount() > 2:  # if there are at least two columns in the table
+                for x in range(self.jobtable.columnCount(), 1, -1):  # for every column but the first two
+                    self.jobtable.removeColumn(x)  # delete the column
+            if self.jobtable.columnCount() == 2:  # if there are only two columns
+                rotation = 1  # stores the current rotation
 
-            for c in range(self.jobtable.columnCount(), num_rotations[0] + self.jobtable.columnCount() - 1):
+                # create a progress bar dialog - without this the UI would appear unresponsive
+                progress = QProgressDialog("Generating List...", "Cancel", 0, num_rotations[0])
+                progress.setWindowModality(QtCore.Qt.ApplicationModal)
 
-                if (progress.wasCanceled()):
-                    break
+                # for each column in the rotation
+                for c in range(self.jobtable.columnCount(), num_rotations[0] + self.jobtable.columnCount() - 1):
 
-                self.jobtable.insertColumn(self.jobtable.columnCount())
-                offset = 0
-                progress.setValue(rotation)
-                for r in range(self.jobtable.rowCount()):
-                    try:
-                        item = QTableWidgetItem(self.jobtable.item(r, 1).data(0))
-                        if rotation + r < self.jobtable.rowCount():
-                            self.jobtable.setItem(rotation + r, c, item)
-                        else:
-                            self.jobtable.setItem(offset, c, item)
-                            offset += 1
+                    if progress.wasCanceled():  # if cancel button clicked
+                        break  # break the loop
 
-                    except TypeError:
-                        pass
-                rotation += 1
+                    self.jobtable.insertColumn(self.jobtable.columnCount())  # add another column at end of table
+                    offset = 0  # stores the offset of each column
+                    progress.setValue(rotation)  # update the progress bar
+                    for r in range(self.jobtable.rowCount()):  # for each row in each column
+                        try:
+                            item = QTableWidgetItem(self.jobtable.item(r, 1).data(0))  # create a new table item
+                            if rotation + r < self.jobtable.rowCount():  # if r is less than the row count
+                                self.jobtable.setItem(rotation + r, c, item)  # insert the item into the table
+                            else:  # if bottom of table is reached - start at top of table
+                                self.jobtable.setItem(offset, c, item)  # insert item into the table
+                                offset += 1  # increment offset
 
-    def _close(self):
-        if self.current_file:
-            self.save_on_exit()
+                        except TypeError:  # if it doesn't work
+                            pass  # do nothing
+
+                    rotation += 1  # increment rotation
+
+    def _close(self):  # called when user clicks the close button
+        if self.current_file:  # if there is an open file
+            self.save_on_exit()  # prompt user to save
         else:
-            sys.exit()
+            sys.exit()  # else just exit
 
     def save_on_exit(self):
         save = QMessageBox()
