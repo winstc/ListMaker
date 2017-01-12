@@ -20,8 +20,8 @@ $ pip install PyQt5 xlsxwriter
 ### Running the Software
 
 * On GNU/Linux
- * Open a terminal in the folder containing this software
- * Run `python3 GUI_interface.py`
+ * Open a terminal at the location containing this software
+ * Run `python3 ListMaker.py`
 
  
 ## Instructions
