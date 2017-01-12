@@ -67,7 +67,7 @@ class MainWindow(QWidget):  # class for the main window of the program
         self.show()  # show the main window
 
     def open(self):  # called when user clicks the open button
-        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "Comma Separated Value (*.csv)")  # create a new 'open file' dialog
+        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "Comma Separated Value (*.csv);;Text File (*.txt)")  # create a new 'open file' dialog
         if file_name[0] != '':  # if the file name isn't blank
             self.current_file = file_name[0]  # set current_file name to the file the user picked
             csv_f = fh.CSVFile(file_name[0])  # create a new 'CSVFile' instance from file_handler.py
@@ -159,21 +159,21 @@ class MainWindow(QWidget):  # class for the main window of the program
             sys.exit()  # else just exit
 
     def save_on_exit(self):
-        save = QMessageBox()
-        save.setText("You are about to exit.")
-        save.setInformativeText("Do you want to save your work?")
-        save.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel | QMessageBox.Discard)
-        save.setDefaultButton(QMessageBox.Save)
+        save = QMessageBox()  # create a dialog box to prompt user to save
+        save.setText("You are about to exit.")  # set dialog text
+        save.setInformativeText("Do you want to save your work?")  # set dialog subtext
+        save.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel | QMessageBox.Discard)  # add buttons to dialog
+        save.setDefaultButton(QMessageBox.Save)  # set the default button
 
-        return_val = save.exec_()
+        return_val = save.exec_()  # show the dialog
 
-        if return_val == QMessageBox.Save:
-            if self.save():
-                sys.exit()
-        elif return_val == QMessageBox.Cancel:
-            pass
-        elif return_val == QMessageBox.Discard:
-            sys.exit()
+        if return_val == QMessageBox.Save:  # if uses selects save
+            if self.save():  # call save method -  if user saves
+                sys.exit()  # exit
+        elif return_val == QMessageBox.Cancel:  # if user selects cancel
+            pass  # do nothing
+        elif return_val == QMessageBox.Discard:  # if user selects discard
+            sys.exit()  # exit
 
     def read_table_data(self):  # read data from the table returns it as a list
         data = []  # used to store the data read from table
