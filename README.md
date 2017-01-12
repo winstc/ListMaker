@@ -9,11 +9,12 @@ that rotate. The lists are saved as a standard Comma Separated Value (*.csv) and
    
  * [Python3](https://www.python.org/downloads/)
  * [PyQt5](https://www.riverbankcomputing.com/software/pyqt/download5)
+ * [xlsxwriter](http://xlsxwriter.readthedocs.io/)
 
 ##### On Ubuntu:
 ```bash
 $ sudo apt-get install python3 pip3
-$ pip install PyQt5
+$ pip install PyQt5 xlsxwriter
 ```
 
 ### Running the Software
@@ -40,6 +41,7 @@ $ pip install PyQt5
  2. After verifying that all data has been entered correctly, click the _Update_ Button
  3. You will be prompted for a number. Enter the number of desired rotations (This includes _Column 2_)
  4. Select _OK_ to continue (This will overwrite all columns past _Column 2_)
+ 5. Columns should now be updated
 
 ## Credits
 Written By: Winston Cadwell
