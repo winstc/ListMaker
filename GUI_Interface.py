@@ -187,8 +187,7 @@ class MainWindow(QWidget):  # class for the main window of the program
 
         return data  # return the table data
 
-
-if __name__ == '__main__':  # if file is launched by itself
-        app = QApplication(sys.argv)  # create a new QApplication
-        ex = MainWindow()  # create the main window
-        sys.exit(app.exec_())  # exit when the app closes
+def run_main_program():
+    app = QApplication(sys.argv)  # create a new QApplication
+    ex = MainWindow()  # create the main window
+    sys.exit(app.exec_())  # exit when the app closes
