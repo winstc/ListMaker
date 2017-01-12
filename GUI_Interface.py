@@ -1,8 +1,10 @@
 #!/usr/bin/python3.5
+# Written by Winston Cadwell
+# This file contains the main logic and interface code
+# for the list maker program.
 
 import sys  # import system library
 from PyQt5 import QtCore
-from PyQt5.QtGui import QStandardItemModel  # import the QStandardItemModel object
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, \
     QTableWidgetItem, QInputDialog, QMessageBox, QProgressDialog  # import the needed Qt widgets
 import file_handler as fh  # import file_handler.py

@@ -1,4 +1,5 @@
 #!/usr/bin/python3.5
+# Written by Winston Cadwell
 # this file simply check that dependencies are installed and runs the program
 
 import GUI_Interface
