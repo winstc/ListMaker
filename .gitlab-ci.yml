@@ -1,7 +1,6 @@
 test:
   script:
-  - export DATABASE_URL=postgres://postgres:@postgres:5432/python-test-app
-  - apt-get update -qy
-  - apt-get install -y python3 python-pip
+  - apt-get update 
+  - apt-get install python3 pip3
   - pip install PyQt5 xlsxwriter
   - python3 ListMaker.py
