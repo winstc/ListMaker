@@ -4,9 +4,11 @@
 # for the list maker program.
 
 import sys  # import system library
-from PyQt5 import *
-from PyQt5.QtWidgets import *  # import the needed Qt widgets
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QDialog, QApplication, QStatusBar, QAction, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, \
+    QTableWidgetItem, QInputDialog, QMessageBox, QProgressDialog  # import the needed Qt widgets
 import file_handler as fh  # import file_handler.py
+import insertDates as idate
 
 
 class MainWindow(QMainWindow):  # class for the main window of the program
@@ -48,13 +50,18 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         addRowsAction.setStatusTip('Add row to table')
         addRowsAction.triggered.connect(self.addrow)
 
+        addDatesAction = QAction('Add Dates', self)
+        addDatesAction.setShortcut('Ctrl+D')
+        addDatesAction.setStatusTip('Add Dates to table')
+        addDatesAction.triggered.connect(self.addDates)
+
         updateBtn = QPushButton("Update", self)  # create the update button
         updateBtn.clicked.connect(self.update_list)  # link it the its method
 
         updateNormalAction = QAction('Normal Update', self)
         updateNormalAction.setShortcut('Ctrl+U')
         updateNormalAction.setStatusTip('Updates the list')
-        updateNormalAction.triggered.connect(self.update)
+        updateNormalAction.triggered.connect(self.update_list)
 
         fileMenu = self.menuBar().addMenu("File")
         fileMenu.addAction(openAction)
@@ -64,6 +71,7 @@ class MainWindow(QMainWindow):  # class for the main window of the program
 
         insertMenu = self.menuBar().addMenu("Insert")
         insertMenu.addAction(addRowsAction)
+        insertMenu.addAction(addDatesAction)
 
         updateMenu = self.menuBar().addMenu("Update")
         updateMenu.addAction(updateNormalAction)
@@ -78,6 +86,7 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         self.jobtable.insertColumn(0)  # add a new column at index 0
         self.jobtable.insertColumn(0)  # add a new column at index 0
         self.jobtable.insertRow(0)  # add a new row at index 0
+        self.jobtable.cellChanged.connect(self.table_change)
 
         self.setCentralWidget(self.jobtable)  # set the window layout to use veryBox for the layout
 
@@ -173,6 +182,7 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         if self.current_file:  # if there is an open file
             self.save_on_exit()  # prompt user to save
         else:
+
             sys.exit()  # else just exit
 
     def save_on_exit(self):
@@ -204,7 +214,15 @@ class MainWindow(QMainWindow):  # class for the main window of the program
 
         return data  # return the table data
 
+    def table_change(self):
+        self.statusBar.showMessage("Reviewing Changes...")
+
+    def addDates(self):
+        idate.showDialog()
+
 def run_main_program():
     app = QApplication(sys.argv)  # create a new QApplication
     ex = MainWindow()  # create the main window
+
     sys.exit(app.exec_())  # exit when the app closes
+
