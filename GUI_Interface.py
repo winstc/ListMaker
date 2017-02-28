@@ -5,12 +5,13 @@
 
 import sys  # import system library
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, \
+from PyQt5.QtWidgets import QDialog, QApplication, QStatusBar, QAction, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, \
     QTableWidgetItem, QInputDialog, QMessageBox, QProgressDialog  # import the needed Qt widgets
 import file_handler as fh  # import file_handler.py
+import insertDates as idate
 
 
-class MainWindow(QWidget):  # class for the main window of the program
+class MainWindow(QMainWindow):  # class for the main window of the program
 
     def __init__(self):  #
 
@@ -26,45 +27,68 @@ class MainWindow(QWidget):  # class for the main window of the program
         self.move(300, 300)  # move the window away from the screen edge
         self.setWindowTitle('List Maker')  # set the window title
 
-        openBtn = QPushButton('Open', self)  # create the open button
-        openBtn.clicked.connect(self.open)  # link it to its method
+        openAction = QAction('Open', self)
+        openAction.setShortcut('Ctrl+O')
+        openAction.setStatusTip('Open a file')
+        openAction.triggered.connect(self.open)
 
-        saveBtn = QPushButton('Save', self)  # create the save button
-        saveBtn.clicked.connect(self.save)  # link it the its method
+        saveAction = QAction('Save', self)
+        saveAction.setShortcut('Ctrl+S')
+        saveAction.setStatusTip('Save current document')
+        saveAction.triggered.connect(self.save)
 
-        addRowBtn = QPushButton('Add Rows', self)  # create the Add Rows button
-        addRowBtn.clicked.connect(self.addrow)  # link it the its method
+        exportXLSXAction = QAction('Export to XLSX', self)
+        exportXLSXAction.setShortcut('Ctrl+E')
+        exportXLSXAction.setStatusTip('Export to XLSX')
+        exportXLSXAction.triggered.connect(self.save)
+
+        quitAction = QAction('Quit', self)
+        quitAction.triggered.connect(self._close)
+
+        addRowsAction = QAction('Add Rows', self)
+        addRowsAction.setShortcut('Ctrl+I')
+        addRowsAction.setStatusTip('Add row to table')
+        addRowsAction.triggered.connect(self.addrow)
+
+        addDatesAction = QAction('Add Dates', self)
+        addDatesAction.setShortcut('Ctrl+D')
+        addDatesAction.setStatusTip('Add Dates to table')
+        addDatesAction.triggered.connect(self.addDates)
 
         updateBtn = QPushButton("Update", self)  # create the update button
         updateBtn.clicked.connect(self.update_list)  # link it the its method
 
-        exportBtn = QPushButton('Export', self)  # create the export button
-        exportBtn.clicked.connect(self.export_XLSX)  # link it the its method
+        updateNormalAction = QAction('Normal Update', self)
+        updateNormalAction.setShortcut('Ctrl+U')
+        updateNormalAction.setStatusTip('Updates the list')
+        updateNormalAction.triggered.connect(self.update_list)
 
-        closeBtn = QPushButton('Close', self)  # create the close button
-        closeBtn.clicked.connect(self._close)  # link it the its method
+        fileMenu = self.menuBar().addMenu("File")
+        fileMenu.addAction(openAction)
+        fileMenu.addAction(saveAction)
+        fileMenu.addAction(exportXLSXAction)
+        fileMenu.addAction(quitAction)
+
+        insertMenu = self.menuBar().addMenu("Insert")
+        insertMenu.addAction(addRowsAction)
+        insertMenu.addAction(addDatesAction)
+
+        updateMenu = self.menuBar().addMenu("Update")
+        updateMenu.addAction(updateNormalAction)
+
+        self.statusBar = QStatusBar()
+        self.setStatusBar(self.statusBar)
+
+        self.statusBar.showMessage("Ready...")
 
         # create and configure the main table
         self.jobtable = QTableWidget()  # create a new table widget
         self.jobtable.insertColumn(0)  # add a new column at index 0
         self.jobtable.insertColumn(0)  # add a new column at index 0
         self.jobtable.insertRow(0)  # add a new row at index 0
+        self.jobtable.cellChanged.connect(self.table_change)
 
-        btnBox = QHBoxLayout()  # create a layout box for program buttons
-        btnBox.addStretch(1)  # set the box to fill the window horizontally
-        # add program buttons to the layout box
-        btnBox.addWidget(openBtn)
-        btnBox.addWidget(saveBtn)
-        btnBox.addWidget(addRowBtn)
-        btnBox.addWidget(updateBtn)
-        btnBox.addWidget(exportBtn)
-        btnBox.addWidget(closeBtn)
-
-        vertBox = QVBoxLayout()  # create another layout box to hold the rest of the UI
-        vertBox.addWidget(self.jobtable)  # add the table to the layout box
-        vertBox.addLayout(btnBox)  # add the button layout box to vertBox
-
-        self.setLayout(vertBox)  # set the window layout to use veryBox for the layout
+        self.setCentralWidget(self.jobtable)  # set the window layout to use veryBox for the layout
 
         self.show()  # show the main window
 
@@ -158,6 +182,7 @@ class MainWindow(QWidget):  # class for the main window of the program
         if self.current_file:  # if there is an open file
             self.save_on_exit()  # prompt user to save
         else:
+
             sys.exit()  # else just exit
 
     def save_on_exit(self):
@@ -189,7 +214,15 @@ class MainWindow(QWidget):  # class for the main window of the program
 
         return data  # return the table data
 
+    def table_change(self):
+        self.statusBar.showMessage("Reviewing Changes...")
+
+    def addDates(self):
+        idate.showDialog()
+
 def run_main_program():
     app = QApplication(sys.argv)  # create a new QApplication
     ex = MainWindow()  # create the main window
+
     sys.exit(app.exec_())  # exit when the app closes
+

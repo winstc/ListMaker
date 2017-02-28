@@ -1,6 +1,7 @@
-#!/usr/bin/python3.5
+#!/usr/bin/python3.
 # Written by Winston Cadwell
-# this file simply check that dependencies are installed and runs the program
+# this file simply checks that dependencies are installed and runs the program
+
 
 import GUI_Interface
 import importlib as imp
