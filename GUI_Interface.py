@@ -5,7 +5,7 @@
 
 import sys  # import system library
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDialog, QApplication, QStatusBar, QAction, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, \
+from PyQt5.QtWidgets import QDialog, QAbstractItemView, QApplication, QStatusBar, QAction, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QTableWidget, QFileDialog, \
     QTableWidgetItem, QInputDialog, QMessageBox, QProgressDialog  # import the needed Qt widgets
 import file_handler as fh  # import file_handler.py
 import insertDates as idate
@@ -22,6 +22,11 @@ class MainWindow(QMainWindow):  # class for the main window of the program
     def init_UI(self):  # handles the setup of the MainWindow
 
         self.current_file = None  # create a variable that will be used to store the currently opened file name
+
+        self.updated = False
+        self.updating = False
+        self.defaultRots = 0
+        self.live = False
 
         self.resize(500, 500)  # resize the window
         self.move(300, 300)  # move the window away from the screen edge
@@ -50,18 +55,24 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         addRowsAction.setStatusTip('Add row to table')
         addRowsAction.triggered.connect(self.addrow)
 
+        deleteRowAction = QAction('Delete Row', self)
+        deleteRowAction.setStatusTip('Delete Selected Row')
+        deleteRowAction.setShortcut('Delete')
+        deleteRowAction.triggered.connect(self.deleteRow)
+
+
         addDatesAction = QAction('Add Dates', self)
         addDatesAction.setShortcut('Ctrl+D')
         addDatesAction.setStatusTip('Add Dates to table')
         addDatesAction.triggered.connect(self.addDates)
 
-        updateBtn = QPushButton("Update", self)  # create the update button
-        updateBtn.clicked.connect(self.update_list)  # link it the its method
+        self.updateLiveAction = QAction('Live', self, checkable=True)
+        self.updateLiveAction.triggered.connect(self.toggleLive)
 
         updateNormalAction = QAction('Normal Update', self)
         updateNormalAction.setShortcut('Ctrl+U')
         updateNormalAction.setStatusTip('Updates the list')
-        updateNormalAction.triggered.connect(self.update_list)
+        updateNormalAction.triggered.connect(self.update_normal)
 
         fileMenu = self.menuBar().addMenu("File")
         fileMenu.addAction(openAction)
@@ -69,11 +80,15 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         fileMenu.addAction(exportXLSXAction)
         fileMenu.addAction(quitAction)
 
+        editMenu = self.menuBar().addMenu("Edit")
+        editMenu.addAction(deleteRowAction)
+
         insertMenu = self.menuBar().addMenu("Insert")
         insertMenu.addAction(addRowsAction)
         insertMenu.addAction(addDatesAction)
 
         updateMenu = self.menuBar().addMenu("Update")
+        updateMenu.addAction(self.updateLiveAction)
         updateMenu.addAction(updateNormalAction)
 
         self.statusBar = QStatusBar()
@@ -89,6 +104,8 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         self.jobtable.cellChanged.connect(self.table_change)
 
         self.setCentralWidget(self.jobtable)  # set the window layout to use veryBox for the layout
+
+        self.jobtable.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.show()  # show the main window
 
@@ -140,11 +157,25 @@ class MainWindow(QMainWindow):  # class for the main window of the program
             for i in range(num_of_rows[0]):  # for number of requested rows
                 self.jobtable.insertRow(self.jobtable.rowCount())  # add row at the end of the table
 
-    def update_list(self):  # add rotations to the list
+    def deleteRow(self):
+        for index in sorted(self.jobtable.selectionModel().selectedRows(), reverse=True):
+            self.jobtable.removeRow(index.row())
+
+    def update_normal(self):
+        self.updated = True
+
         # prompt user for number of rotations - default is the number of rows it the table
         num_rotations = QInputDialog.getInt(self, 'Update', 'Number of Rotations', self.jobtable.rowCount())
+        self.defaultRots = num_rotations[0]
 
-        if num_rotations[1]:  # if user confirms dialog
+        if num_rotations[1]:
+            self.update_list(num_rotations[0])
+
+    def update_list(self, rotations):  # add rotations to the list
+
+        self.updating = True
+
+        if rotations:  # if user confirms dialog
             if self.jobtable.columnCount() > 2:  # if there are at least two columns in the table
                 for x in range(self.jobtable.columnCount(), 1, -1):  # for every column but the first two
                     self.jobtable.removeColumn(x)  # delete the column
@@ -152,11 +183,11 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                 rotation = 1  # stores the current rotation
 
                 # create a progress bar dialog - without this the UI would appear unresponsive
-                progress = QProgressDialog("Generating List...", "Cancel", 0, num_rotations[0])
+                progress = QProgressDialog("Generating List...", "Cancel", 0, rotations)
                 progress.setWindowModality(QtCore.Qt.ApplicationModal)
 
                 # for each column in the rotation
-                for c in range(self.jobtable.columnCount(), num_rotations[0] + self.jobtable.columnCount() - 1):
+                for c in range(self.jobtable.columnCount(), rotations + self.jobtable.columnCount() - 1):
 
                     if progress.wasCanceled():  # if cancel button clicked
                         break  # break the loop
@@ -177,6 +208,8 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                             pass  # do nothing
 
                     rotation += 1  # increment rotation
+
+        self.updating = False
 
     def _close(self):  # called when user clicks the close button
         if self.current_file:  # if there is an open file
@@ -214,8 +247,16 @@ class MainWindow(QMainWindow):  # class for the main window of the program
 
         return data  # return the table data
 
+    def toggleLive(self):
+        self.live = self.updateLiveAction.isChecked()
+
     def table_change(self):
-        self.statusBar.showMessage("Reviewing Changes...")
+        if not self.updating:
+            self.statusBar.showMessage("Reviewing Changes...")
+            if self.updated and self.live:
+                self.update_list(self.defaultRots)
+            else:
+                self.statusBar.showMessage("Skipping Update")
 
     def addDates(self):
         idate.showDialog()
