@@ -171,7 +171,7 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         if num_rotations[1]:
             self.update_list(num_rotations[0])
 
-    def update_list(self, rotations):  # add rotations to the list
+    def update_list_old(self, rotations):  # add rotations to the list
 
         self.updating = True
 
@@ -188,12 +188,12 @@ class MainWindow(QMainWindow):  # class for the main window of the program
 
                 # for each column in the rotation
                 for c in range(self.jobtable.columnCount(), rotations + self.jobtable.columnCount() - 1):
-
                     if progress.wasCanceled():  # if cancel button clicked
                         break  # break the loop
 
                     self.jobtable.insertColumn(self.jobtable.columnCount())  # add another column at end of table
                     offset = 0  # stores the offset of each column
+                    print("TEST {0}-{1}".format(c, offset))
                     progress.setValue(rotation)  # update the progress bar
                     for r in range(self.jobtable.rowCount()):  # for each row in each column
                         try:
@@ -210,6 +210,40 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                     rotation += 1  # increment rotation
 
         self.updating = False
+
+    def update_list(self, rotations):
+        self.updating = True  # set updating variable to true to prevent problems while updating
+
+        # set the correct number of columns
+        if self.jobtable.columnCount()-1 < rotations:  # check if we need more columns
+            for n in range(rotations-self.jobtable.columnCount()+1):  # for each needed column
+                self.jobtable.insertColumn(self.jobtable.columnCount())  # add a column at the end of the table
+        elif self.jobtable.columnCount()-1 > rotations:  # if there are too many columns
+            for n in range(self.jobtable.columnCount()-rotations-1):  # for each column to be deleted
+                self.jobtable.removeColumn(self.jobtable.columnCount()-1)  # add a column at the end of the table
+
+        offset = 0
+
+        # start filling columns
+        for col in range(2, rotations+1):  # for each column in rotation minus the start rotation
+            offset +=1
+            if offset == self.jobtable.rowCount():
+                offset = 0
+            for row in range(self.jobtable.rowCount()):
+                prow = row + offset
+                if row + offset >= self.jobtable.rowCount():
+                    prow = prow - self.jobtable.rowCount()
+                print(prow)
+
+                try:
+                    item = QTableWidgetItem(self.jobtable.item(row, 1).data(0))  # create a new table item
+                    self.jobtable.setItem(prow, col, item)  # insert the item into the table
+
+
+                except TypeError:  # if it doesn't work
+                    pass  # do nothing
+
+
 
     def _close(self):  # called when user clicks the close button
         if self.current_file:  # if there is an open file
