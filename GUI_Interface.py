@@ -187,12 +187,18 @@ class MainWindow(QMainWindow):  # class for the main window of the program
     def update_normal(self):
         self.updated = True
 
+        if self.defaultRots > 0:
+            default = self.defaultRots
+        else:
+            default = self.jobtable.rowCount()
+
         # prompt user for number of rotations - default is the number of rows it the table
-        num_rotations = QInputDialog.getInt(self, 'Update', 'Number of Rotations', self.jobtable.rowCount())
+        num_rotations = QInputDialog.getInt(self, 'Update', 'Number of Rotations', default)
         self.defaultRots = num_rotations[0]
 
         if num_rotations[1]:
             self.update_list(num_rotations[0])
+
 
     def update_list_old(self, rotations):  # add rotations to the list
 
@@ -216,7 +222,6 @@ class MainWindow(QMainWindow):  # class for the main window of the program
 
                     self.jobtable.insertColumn(self.jobtable.columnCount())  # add another column at end of table
                     offset = 0  # stores the offset of each column
-                    print("TEST {0}-{1}".format(c, offset))
                     progress.setValue(rotation)  # update the progress bar
                     for r in range(self.jobtable.rowCount()):  # for each row in each column
                         try:
@@ -256,7 +261,6 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                 prow = row + offset
                 if row + offset >= self.jobtable.rowCount():
                     prow = prow - self.jobtable.rowCount()
-                print(prow)
 
                 try:
                     item = QTableWidgetItem(self.jobtable.item(row, 1).data(0))  # create a new table item
