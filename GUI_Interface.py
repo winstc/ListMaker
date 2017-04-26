@@ -110,11 +110,24 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         self.show()  # show the main window
 
     def open(self):  # called when user clicks the open button
-        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "Comma Separated Value (*.csv);;Text File (*.txt)")  # create a new 'open file' dialog
+        file_name = QFileDialog.getOpenFileName(self, 'Open File', '/home/', "JSON File (*.json);;Comma Separated Value (*.csv)")  # create a new 'open file' dialog
         if file_name[0] != '':  # if the file name isn't blank
             self.current_file = file_name[0]  # set current_file name to the file the user picked
-            csv_f = fh.CSVFile(file_name[0])  # create a new 'CSVFile' instance from file_handler.py
-            data = csv_f.read()  # read the .csv file
+
+            if file_name[1] == "JSON File (*.json)":
+                self.updating = True
+                JSON_f = fh.JSONFile(file_name[0])  # create a new 'CSVFile' instance from file_handler.py
+                data = JSON_f.readJsonTable()  # read the .csv file
+                #self.live = JSON_f.readJson("live")
+                self.updated = JSON_f.readJson("updated")
+                self.defaultRots = JSON_f.readJson("defaultRots")
+                self.updating = False
+
+            elif file_name[1] == "Comma Separated Value (*.csv)":
+                csv_f = fh.CSVFile(file_name[0])
+                data = csv_f.read()
+            else:
+                print("Error Opening File!!")
 
             # set columns and rows to match those of the file
             self.jobtable.setRowCount(len(data))
@@ -129,10 +142,20 @@ class MainWindow(QMainWindow):  # class for the main window of the program
 
         # prompt user for location and name of file
         file_name = QFileDialog.getSaveFileName(self, 'Save File', self.current_file,
-                                                "Comma Separated Value (*.csv)")
+                                                "JSON File (*.json);;Comma Separated Value (*.csv)")
+
+        print(file_name)
         if file_name[0] != '':  # if the selected path is not blank
-            csv_f = fh.CSVFile(file_name[0])  # create new instance of CSVFile class using selected filename
-            csv_f.write(self.read_table_data())  # get data from table write it to .csv file
+            if file_name[1] == "JSON File (*.json)":
+                JSON_f = fh.JSONFile(file_name[0])  # create new instance of CSVFile class using selected filename
+                JSON_f.writeJson(self.read_table_data(), self.live, self.updated, self.defaultRots)  # get data from table write it to .csv file
+            elif file_name[1] == "Comma Separated Value (*.csv)":
+                csv_f = fh.CSVFile(file_name[0])
+                data = csv_f.write(self.read_table_data())
+            else:
+                print("Error Opening File!!")
+
+
             return 1  # return if save was attempted
         else:  # if file name was blank
             return 0  # return 0
@@ -243,7 +266,7 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                 except TypeError:  # if it doesn't work
                     pass  # do nothing
 
-
+        self.updating = False  # done updating
 
     def _close(self):  # called when user clicks the close button
         if self.current_file:  # if there is an open file

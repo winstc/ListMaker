@@ -7,6 +7,7 @@
 
 import csv  # import csv library for csv file manipulation
 import xlsxwriter  # import xlsx library for excel file manipulation
+import json
 
 
 class CSVFile:  # class for read/writing of .csv files
@@ -27,6 +28,34 @@ class CSVFile:  # class for read/writing of .csv files
             for row in data:  # row each row
                 csv_write.writerow(row)  # write the row
 
+class JSONFile:  # class for read/writing of .csv files
+    def __init__(self, file):
+        self.file = file  # store the requested file path
+
+    def writeJson(self, data, live=False, updated=False, default_rots=0):
+        with open(self.file, 'w') as file:
+            file.write(json.dumps({"live": live, "updated": updated, "defaultRots": default_rots,"data": data}, sort_keys=True, indent=4))
+
+    def readJsonTable(self):
+        with open(self.file, 'r') as file:
+            JSON_String = file.read()
+            parsed_JSON = json.loads(JSON_String)
+
+            return parsed_JSON['data']
+
+    def readJson(self, value):
+        with open(self.file, 'r') as file:
+            JSON_String = file.read()
+            parsed_JSON = json.loads(JSON_String)
+
+        if value == "live":
+            return parsed_JSON['live']
+        elif value == "updated":
+            return parsed_JSON['updated']
+        elif value == "defaultRots":
+            return parsed_JSON['defaultRots']
+        else:
+            return None
 
 class XLSXFile:  # class for read/writing of .xlsx files
     def __init__(self, path, worksheet):
@@ -39,3 +68,4 @@ class XLSXFile:  # class for read/writing of .xlsx files
 
     def close(self):  # closes the workbook
         self.workbook.close()  # close the workbook
+
