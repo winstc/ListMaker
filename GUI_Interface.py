@@ -199,46 +199,6 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         if num_rotations[1]:
             self.update_list(num_rotations[0])
 
-
-    def update_list_old(self, rotations):  # add rotations to the list
-
-        self.updating = True
-
-        if rotations:  # if user confirms dialog
-            if self.jobtable.columnCount() > 2:  # if there are at least two columns in the table
-                for x in range(self.jobtable.columnCount(), 1, -1):  # for every column but the first two
-                    self.jobtable.removeColumn(x)  # delete the column
-            if self.jobtable.columnCount() == 2:  # if there are only two columns
-                rotation = 1  # stores the current rotation
-
-                # create a progress bar dialog - without this the UI would appear unresponsive
-                progress = QProgressDialog("Generating List...", "Cancel", 0, rotations)
-                progress.setWindowModality(QtCore.Qt.ApplicationModal)
-
-                # for each column in the rotation
-                for c in range(self.jobtable.columnCount(), rotations + self.jobtable.columnCount() - 1):
-                    if progress.wasCanceled():  # if cancel button clicked
-                        break  # break the loop
-
-                    self.jobtable.insertColumn(self.jobtable.columnCount())  # add another column at end of table
-                    offset = 0  # stores the offset of each column
-                    progress.setValue(rotation)  # update the progress bar
-                    for r in range(self.jobtable.rowCount()):  # for each row in each column
-                        try:
-                            item = QTableWidgetItem(self.jobtable.item(r, 1).data(0))  # create a new table item
-                            if rotation + r < self.jobtable.rowCount():  # if r is less than the row count
-                                self.jobtable.setItem(rotation + r, c, item)  # insert the item into the table
-                            else:  # if bottom of table is reached - start at top of table
-                                self.jobtable.setItem(offset, c, item)  # insert item into the table
-                                offset += 1  # increment offset
-
-                        except TypeError:  # if it doesn't work
-                            pass  # do nothing
-
-                    rotation += 1  # increment rotation
-
-        self.updating = False
-
     def update_list(self, rotations):
         self.updating = True  # set updating variable to true to prevent problems while updating
 
