@@ -118,10 +118,9 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                 self.updating = True
                 JSON_f = fh.JSONFile(file_name[0])  # create a new 'CSVFile' instance from file_handler.py
                 data = JSON_f.readJsonTable()  # read the .csv file
-                #self.live = JSON_f.readJson("live")
+                self.live = JSON_f.readJson("live")
                 self.updated = JSON_f.readJson("updated")
                 self.defaultRots = JSON_f.readJson("defaultRots")
-                self.updating = False
 
             elif file_name[1] == "Comma Separated Value (*.csv)":
                 csv_f = fh.CSVFile(file_name[0])
@@ -137,6 +136,8 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                 for j, col in enumerate(row): # and each column in each row
                     item = QTableWidgetItem(col)  # create a new item with the data for current cell
                     self.jobtable.setItem(i, j, item)  # add it to the table
+
+        self.updating = False
 
     def save(self):  # saves the currently opened file
 
@@ -227,8 +228,8 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                     self.jobtable.setItem(prow, col, item)  # insert the item into the table
 
 
-                except TypeError:  # if it doesn't work
-                    pass  # do nothing
+                except AttributeError:  # if it doesn't work
+                    print("Problem Updating: {} {}".format(col, prow))
 
         self.updating = False  # done updating
 
