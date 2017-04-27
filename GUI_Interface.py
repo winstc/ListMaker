@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         self.updating = False
         self.defaultRots = 0
         self.live = False
+        self.hasDates = False
 
         self.resize(500, 500)  # resize the window
         self.move(300, 300)  # move the window away from the screen edge
@@ -138,6 +139,7 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                     self.jobtable.setItem(i, j, item)  # add it to the table
 
         self.updating = False
+        self.table_change()
 
     def save(self):  # saves the currently opened file
 
@@ -149,7 +151,7 @@ class MainWindow(QMainWindow):  # class for the main window of the program
         if file_name[0] != '':  # if the selected path is not blank
             if file_name[1] == "JSON File (*.json)":
                 JSON_f = fh.JSONFile(file_name[0])  # create new instance of CSVFile class using selected filename
-                JSON_f.writeJson(self.read_table_data(), self.live, self.updated, self.defaultRots)  # get data from table write it to .csv file
+                JSON_f.writeAllJson(self.read_table_data(), self.live, self.updated, self.defaultRots)  # get data from table write it to .csv file
             elif file_name[1] == "Comma Separated Value (*.csv)":
                 csv_f = fh.CSVFile(file_name[0])
                 data = csv_f.write(self.read_table_data())
@@ -213,15 +215,20 @@ class MainWindow(QMainWindow):  # class for the main window of the program
 
         offset = 0
 
+        if self.hasDates:
+            extraRows = 1
+        else:
+            extraRows = 0
+
         # start filling columns
         for col in range(2, rotations+1):  # for each column in rotation minus the start rotation
             offset +=1
             if offset == self.jobtable.rowCount():
                 offset = 0
-            for row in range(self.jobtable.rowCount()):
+            for row in range(extraRows, self.jobtable.rowCount()):
                 prow = row + offset
                 if row + offset >= self.jobtable.rowCount():
-                    prow = prow - self.jobtable.rowCount()
+                    prow = prow - self.jobtable.rowCount() + extraRows
 
                 try:
                     item = QTableWidgetItem(self.jobtable.item(row, 1).data(0))  # create a new table item
@@ -274,6 +281,9 @@ class MainWindow(QMainWindow):  # class for the main window of the program
 
     def table_change(self):
         if not self.updating:
+            if self.live != self.updateLiveAction.isChecked():
+                self.updateLiveAction.setChecked(self.live)
+
             self.statusBar.showMessage("Reviewing Changes...")
             if self.updated and self.live:
                 self.update_list(self.defaultRots)
@@ -281,7 +291,11 @@ class MainWindow(QMainWindow):  # class for the main window of the program
                 self.statusBar.showMessage("Skipping Update")
 
     def addDates(self):
-        idate.showDialog()
+        self.updating = True
+        if idate.showDialog(self, self.jobtable, self.hasDates):
+            self.hasDates = True
+        self.updating = False
+
 
 def run_main_program():
     app = QApplication(sys.argv)  # create a new QApplication

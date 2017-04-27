@@ -32,7 +32,7 @@ class JSONFile:  # class for read/writing of .csv files
     def __init__(self, file):
         self.file = file  # store the requested file path
 
-    def writeJson(self, data, live=False, updated=False, default_rots=0):
+    def writeAllJson(self, data, live=False, updated=False, default_rots=0):
         with open(self.file, 'w') as file:
             file.write(json.dumps({"live": live, "updated": updated, "defaultRots": default_rots,"data": data}, sort_keys=True, indent=4))
 
@@ -54,6 +54,8 @@ class JSONFile:  # class for read/writing of .csv files
             return parsed_JSON['updated']
         elif value == "defaultRots":
             return parsed_JSON['defaultRots']
+        elif value == "hasDates":
+            return parsed_JSON['hasDates']
         else:
             return None
 
